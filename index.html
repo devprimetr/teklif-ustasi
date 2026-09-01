@@ -91,6 +91,9 @@ dialog{border:none;border-radius:18px;padding:0;max-width:520px;width:calc(100% 
 dialog::backdrop{background:rgba(0,0,0,.55)}
 .dlg-ic{padding:20px}
 .dlg-ic h3{margin:0 0 14px;font-size:17px}
+.gsatir{display:flex;gap:10px;align-items:center;padding:11px 0;
+  border-bottom:1px solid var(--cizgi)}
+.gsatir:last-child{border-bottom:none}
 .gizli{display:none!important}
 @media print{
   .ust,.dugmeler,.yazdirma-gizle{display:none!important}
@@ -102,6 +105,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 
 <div class="ust yazdirma-gizle"><div class="ust-ic">
   <h1>Teklif Ustası</h1>
+  <button id="gecmisAc" title="Geçmiş">🗂</button>
   <button id="temaBtn" title="Tema">◐</button>
 </div></div>
 
@@ -131,7 +135,9 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   <div class="kart toplam-kart">
     <h2>Toplam</h2>
     <div class="tsatir"><span>Ara toplam</span><span id="araToplam">0 ₺</span></div>
+    <div class="tsatir" id="indirimSatir" hidden><span>İndirim</span><span id="indirimTutar">0 ₺</span></div>
     <div class="tsatir"><span id="kdvEtiket">KDV</span><span id="kdv">0 ₺</span></div>
+    <div class="tsatir" id="tevkifatSatir" hidden><span id="tevkifatEtiket">Tevkifat</span><span id="tevkifatTutar">0 ₺</span></div>
     <div class="tsatir buyuk"><span>Genel</span><span id="genel">0 ₺</span></div>
   </div>
 
@@ -186,7 +192,20 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   </div>
 </div></dialog>
 
+<dialog id="gecmisDlg"><div class="dlg-ic">
+  <h3>Geçmiş Teklifler</h3>
+  <p class="ipucu" style="margin:-6px 0 12px"><span id="gecmisSayi"></span> ·
+     yalnızca bu telefonda saklanır</p>
+  <div id="gecmisListe" style="max-height:54vh;overflow-y:auto"></div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="ikincil" id="gecmisTemizle">Tümünü sil</button>
+    <button class="ana" id="gecmisKapat">Kapat</button>
+  </div>
+</div></dialog>
+
 <script src="sektorler.js"></script>
 <script src="app.js"></script>
+
+
 </body>
 </html>

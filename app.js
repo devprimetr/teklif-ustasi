@@ -10,7 +10,12 @@ let durum = {
   opsiyonlar: {},    // { kalemKodu: true/false }
   fiyatlar: {},      // { "sektor.kalemKodu": kullanıcının kendi fiyatı }
   adlar: {},         // { "sektor.kalemKodu": kullanıcının verdiği kalem adı }
+  indirimler: {},    // { indirimKodu: true/false }
+  tevkifat: false,   // KDV tevkifati uygulansin mi
+  tevkifatOran: "",  // kullanicinin sectigi oran (bos = sektor varsayilani)
   firma: { ad: "", tel: "", mail: "", adres: "" },
+  gecmis: [],        // kaydedilen teklifler
+  sayac: {},         // { "2026": 7 } -> teklif numarasi
   tema: "otomatik"
 };
 
@@ -30,7 +35,8 @@ function kaydet() {
   try {
     localStorage.setItem(DEPO, JSON.stringify({
       sektor: durum.sektor, fiyatlar: durum.fiyatlar,
-      adlar: durum.adlar, firma: durum.firma, tema: durum.tema
+      adlar: durum.adlar, firma: durum.firma, tema: durum.tema,
+      gecmis: durum.gecmis, sayac: durum.sayac, tevkifatOran: durum.tevkifatOran
     }));
   } catch (e) { /* yazılamıyorsa sessizce geç, uygulama çalışmaya devam etsin */ }
 }
@@ -49,6 +55,18 @@ function fiyatAl(kalem) {
 
 /* Kalem adı da kullanıcı tarafından değiştirilebilir.
    "Kendi Sektörüm" bunsuz işe yaramıyordu — Kalem 1 / Kalem 2 yazıyordu. */
+/* KDV orani sabit degil: kanun degisiyor, bazi isler indirimli orana
+   giriyor, kimi muaf. Kullanici kendi orani girebilir. */
+function kdvOranAl() {
+  const ozel = durum.fiyatlar[`${durum.sektor}.kdv`];
+  return ozel !== undefined && ozel !== "" ? Number(ozel) : SEKTORLER[durum.sektor].kdv;
+}
+
+function indirimOranAl(ind) {
+  const ozel = durum.fiyatlar[`${durum.sektor}.ind.${ind.kod}`];
+  return ozel !== undefined && ozel !== "" ? Number(ozel) : ind.oran;
+}
+
 function adAl(kalem) {
   const ozel = durum.adlar[`${durum.sektor}.${kalem.kod}`];
   return ozel && ozel.trim() ? ozel.trim() : kalem.ad;
@@ -82,8 +100,37 @@ function hesapla() {
     ara += tutar;
   }
 
-  const kdv = ara * s.kdv / 100;
-  return { satirlar, ara, kdv, genel: ara + kdv, kdvOrani: s.kdv };
+  // indirimler ara toplam uzerinden, KDV'den ONCE
+  const indirimSatirlari = [];
+  let toplamIndirim = 0;
+  for (const i of (s.indirimler || [])) {
+    if (!durum.indirimler[i.kod]) continue;
+    const oran = indirimOranAl(i);
+    const tutar = ara * oran / 100;
+    indirimSatirlari.push({ ad: adAl({kod:"ind."+i.kod, ad:i.ad}), detay: `%${oran}`, tutar: -tutar });
+    toplamIndirim += tutar;
+  }
+
+  const net = ara - toplamIndirim;
+  const kdvOrani = kdvOranAl();
+  const kdv = net * kdvOrani / 100;
+
+  // KDV tevkifati: KDV'nin bir kismi alici tarafindan beyan edilir,
+  // saticiya kalan kisim odenir. Matrah degismez, sadece tahsil edilecek
+  // KDV azalir.
+  let tevkifOran = 0, tevkifEdilen = 0;
+  if (durum.tevkifat && s.tevkifat) {
+    const secili = durum.tevkifatOran || s.tevkifat.oran;
+    const [pay, payda] = secili.split("/").map(Number);
+    tevkifOran = pay / payda;
+    tevkifEdilen = kdv * tevkifOran;
+  }
+  const tahsilKdv = kdv - tevkifEdilen;
+
+  return { satirlar, indirimSatirlari, ara, toplamIndirim, net,
+           kdv, tevkifEdilen, tahsilKdv,
+           tevkifatOranMetin: durum.tevkifatOran || (s.tevkifat && s.tevkifat.oran) || "",
+           genel: net + tahsilKdv, kdvOrani };
 }
 
 /* ---------- çizim ---------- */
@@ -96,7 +143,8 @@ function sektorleriCiz() {
   document.querySelectorAll(".sektor").forEach(el => {
     el.onclick = () => {
       durum.sektor = el.dataset.kod;
-      durum.degerler = {}; durum.opsiyonlar = {};
+      durum.degerler = {}; durum.opsiyonlar = {}; durum.indirimler = {};
+      durum.tevkifat = false; durum.tevkifatOran = "";
       kaydet(); ciz();
     };
   });
@@ -123,6 +171,58 @@ function kalemleriCiz() {
         <span class="kaydir"></span></label></div>`;
   }).join("");
 
+  // indirimler ayri bir grup olarak alta
+  const ind = SEKTORLER[durum.sektor].indirimler || [];
+  if (ind.length) {
+    $("#kalemler").insertAdjacentHTML("beforeend",
+      `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--cizgi)">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;
+             color:var(--soluk);font-weight:700;margin-bottom:10px">İndirimler</div>` +
+      ind.map(i => `<div class="satir">
+        <div class="bilgi"><div class="ad">${kacir(adAl({kod:"ind."+i.kod, ad:i.ad}))}</div>
+          <div class="fiyat">%${indirimOranAl(i)}</div></div>
+        <label class="anahtar"><input type="checkbox" data-ind="${i.kod}"
+          ${durum.indirimler[i.kod] ? "checked" : ""} aria-label="${kacir(i.ad)}">
+          <span class="kaydir"></span></label></div>`).join("") + `</div>`);
+    $("#kalemler").querySelectorAll("input[data-ind]").forEach(el => {
+      el.onchange = () => { durum.indirimler[el.dataset.ind] = el.checked; toplamCiz(); };
+    });
+  }
+
+  // KDV tevkifati - sadece orani tanimli sektorlerde
+  const tv = SEKTORLER[durum.sektor].tevkifat;
+  if (tv) {
+    const secili = durum.tevkifatOran || tv.oran;
+    $("#kalemler").insertAdjacentHTML("beforeend",
+      `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--cizgi)">
+        <div class="satir">
+          <div class="bilgi"><div class="ad">KDV Tevkifatı</div>
+            <div class="fiyat">${kacir(tv.ad)} · ${secili}</div></div>
+          <label class="anahtar"><input type="checkbox" id="tevkifatAnahtar"
+            ${durum.tevkifat ? "checked" : ""} aria-label="KDV Tevkifatı">
+            <span class="kaydir"></span></label></div>
+        <div id="tevkifatAyar" ${durum.tevkifat ? "" : "hidden"}>
+          <label style="margin-top:6px">Oran</label>
+          <select id="tevkifatSecim" style="width:100%;padding:11px 12px;font-size:15px;
+            border:1px solid var(--cizgi);border-radius:11px;background:var(--girdi);
+            color:var(--metin);font-family:inherit">
+            ${TEVKIFAT_ORANLARI.map(o =>
+              `<option value="${o}" ${o === secili ? "selected" : ""}>${o}</option>`).join("")}
+          </select>
+          <p class="ipucu">Tevkifat her müşteride uygulanmaz. Alıcının
+            "belirlenmiş alıcı" olması gerekir ve 2026 için KDV dahil
+            12.000 TL alt sınırı vardır. Muhasebecinize danışın.</p>
+        </div></div>`);
+    $("#tevkifatAnahtar").onchange = e => {
+      durum.tevkifat = e.target.checked;
+      $("#tevkifatAyar").hidden = !e.target.checked;
+      toplamCiz();
+    };
+    $("#tevkifatSecim").onchange = e => {
+      durum.tevkifatOran = e.target.value; kaydet(); ciz();
+    };
+  }
+
   $("#kalemler").querySelectorAll("input[data-kod]").forEach(el => {
     el.oninput = () => { durum.degerler[el.dataset.kod] = el.value; toplamCiz(); };
   });
@@ -134,8 +234,19 @@ function kalemleriCiz() {
 function toplamCiz() {
   const h = hesapla();
   $("#araToplam").textContent = para(h.ara);
+  const iEl = $("#indirimSatir");
+  if (h.toplamIndirim > 0) {
+    iEl.hidden = false;
+    $("#indirimTutar").textContent = "-" + para(h.toplamIndirim);
+  } else { iEl.hidden = true; }
   $("#kdv").textContent = para(h.kdv);
   $("#kdvEtiket").textContent = `KDV (%${h.kdvOrani})`;
+  const tEl = $("#tevkifatSatir");
+  if (h.tevkifEdilen > 0) {
+    tEl.hidden = false;
+    $("#tevkifatEtiket").textContent = `Tevkifat (${h.tevkifatOranMetin})`;
+    $("#tevkifatTutar").textContent = "-" + para(h.tevkifEdilen);
+  } else { tEl.hidden = true; }
   $("#genel").textContent = para(h.genel);
 }
 
@@ -144,12 +255,24 @@ function ciz() { sektorleriCiz(); kalemleriCiz(); toplamCiz(); }
 /* ---------- fiyat düzenleme ---------- */
 $("#fiyatDuzenle").onclick = () => {
   const s = SEKTORLER[durum.sektor];
-  $("#fiyatAlanlari").innerHTML = s.kalemler.map(k => `
+  $("#fiyatAlanlari").innerHTML = `
+    <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--cizgi)">
+      <label>KDV oranı (%)</label>
+      <input type="number" inputmode="decimal" step="any" min="0" max="100"
+             id="kdvAlan" value="${kdvOranAl()}">
+      <p class="ipucu">Genel oran %20, indirimli %10 veya %1. Muafsanız 0 yazın.</p>
+    </div>` + s.kalemler.map(k => `
     <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--cizgi)">
       <label>Kalem adı</label>
       <input type="text" data-ak="${k.kod}" value="${kacir(adAl(k))}" style="margin-bottom:8px">
       <label>${k.tip === "yuzde" ? "Oran (%)" : k.birim ? `Fiyat (₺/${k.birim})` : "Fiyat (₺)"}</label>
       <input type="number" inputmode="decimal" step="any" data-fk="${k.kod}" value="${fiyatAl(k)}">
+    </div>`).join("") + (s.indirimler || []).map(i => `
+    <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--cizgi)">
+      <label>İndirim adı</label>
+      <input type="text" data-ak="ind.${i.kod}" value="${kacir(adAl({kod:'ind.'+i.kod, ad:i.ad}))}" style="margin-bottom:8px">
+      <label>Oran (%)</label>
+      <input type="number" inputmode="decimal" step="any" data-fk="ind.${i.kod}" value="${indirimOranAl(i)}">
     </div>`).join("");
   $("#fiyatDlg").showModal();
 };
@@ -161,6 +284,7 @@ $("#fiyatKaydet").onclick = () => {
   $("#fiyatAlanlari").querySelectorAll("input[data-ak]").forEach(el => {
     durum.adlar[`${durum.sektor}.${el.dataset.ak}`] = el.value;
   });
+  durum.fiyatlar[`${durum.sektor}.kdv`] = $("#kdvAlan").value;
   kaydet(); $("#fiyatDlg").close(); ciz();
 };
 
@@ -199,8 +323,68 @@ $("#temaBtn").onclick = () => {
   temaUygula(); kaydet();
 };
 
+/* ---------- teklif numarasi ve gecmis ---------- */
+function sonrakiNo() {
+  const yil = new Date().getFullYear();
+  durum.sayac[yil] = (durum.sayac[yil] || 0) + 1;
+  kaydet();
+  return `${yil}-${String(durum.sayac[yil]).padStart(3, "0")}`;
+}
+
+function gecmiseKaydet(no, musteri, h) {
+  durum.gecmis.unshift({
+    no, musteri: musteri || "", sektor: durum.sektor,
+    sektorAd: SEKTORLER[durum.sektor].ad,
+    tarih: new Date().toISOString().slice(0, 10),
+    genel: h.genel,
+    degerler: { ...durum.degerler },
+    opsiyonlar: { ...durum.opsiyonlar },
+    indirimler: { ...durum.indirimler }
+  });
+  // en fazla 200 kayit tut - localStorage sinirina takilmasin
+  if (durum.gecmis.length > 200) durum.gecmis.length = 200;
+  kaydet();
+}
+
+function gecmisCiz() {
+  const liste = durum.gecmis;
+  $("#gecmisSayi").textContent = liste.length ? `${liste.length} teklif` : "Henüz teklif yok";
+  $("#gecmisListe").innerHTML = liste.length
+    ? liste.map((g, i) => `<div class="gsatir" data-g="${i}">
+        <div class="bilgi">
+          <div class="ad">${kacir(g.musteri) || "(müşteri adı yok)"}</div>
+          <div class="fiyat">${g.no} · ${kacir(g.sektorAd)} · ${g.tarih.split("-").reverse().join(".")}</div>
+        </div>
+        <div style="text-align:right;white-space:nowrap">
+          <div style="font-weight:700">${para(g.genel)}</div>
+          <button class="duzenle" data-yukle="${i}">geri yükle</button>
+        </div></div>`).join("")
+    : `<p class="ipucu">Teklif oluşturduğunuzda burada listelenir.</p>`;
+
+  $("#gecmisListe").querySelectorAll("[data-yukle]").forEach(el => {
+    el.onclick = () => {
+      const g = durum.gecmis[Number(el.dataset.yukle)];
+      durum.sektor = g.sektor;
+      durum.degerler = { ...g.degerler };
+      durum.opsiyonlar = { ...g.opsiyonlar };
+      durum.indirimler = { ...(g.indirimler || {}) };
+      $("#musteri").value = g.musteri;
+      kaydet(); ciz(); $("#gecmisDlg").close();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+  });
+}
+
+$("#gecmisAc").onclick = () => { gecmisCiz(); $("#gecmisDlg").showModal(); };
+$("#gecmisKapat").onclick = () => $("#gecmisDlg").close();
+$("#gecmisTemizle").onclick = () => {
+  if (!durum.gecmis.length) return;
+  if (!confirm(`${durum.gecmis.length} teklif silinecek. Emin misiniz?`)) return;
+  durum.gecmis = []; kaydet(); gecmisCiz();
+};
+
 /* ---------- teklif metni ---------- */
-function teklifMetni() {
+function teklifMetni(no) {
   const s = SEKTORLER[durum.sektor];
   const h = hesapla();
   const musteri = $("#musteri").value.trim();
@@ -224,7 +408,9 @@ function teklifMetni() {
 $("#paylasBtn").onclick = async () => {
   const h = hesapla();
   if (!h.satirlar.length) { alert("Önce en az bir kalem girin."); return; }
-  const metin = teklifMetni();
+  const no = sonrakiNo();
+  gecmiseKaydet(no, $("#musteri").value.trim(), h);
+  const metin = teklifMetni(no);
   try {
     if (navigator.share) {
       await navigator.share({ title: "Fiyat Teklifi", text: metin });
@@ -240,6 +426,8 @@ $("#teklifBtn").onclick = () => {
   if (!h.satirlar.length) { alert("Önce en az bir kalem girin."); return; }
   const s = SEKTORLER[durum.sektor];
   const musteri = $("#musteri").value.trim();
+  const no = sonrakiNo();
+  gecmiseKaydet(no, musteri, h);
   const bugun = new Date().toLocaleDateString("tr-TR");
   const son = new Date(Date.now() + 14 * 864e5).toLocaleDateString("tr-TR");
 
@@ -270,16 +458,21 @@ td.sag{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 </style></head><body>
 <header><div><div class="buyuk">${kacir(durum.firma.ad) || s.ikon + " " + s.ad}</div>
 <div style="color:#666;font-size:13px">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · ")) || "Fiyat Teklifi"}</div></div>
-<div style="text-align:right;font-size:13px;color:#666">${bugun}</div></header>
+<div style="text-align:right;font-size:13px;color:#666">Teklif No: ${no}<br>${bugun}</div></header>
 ${musteri ? `<p style="margin:0 0 20px"><span style="color:#888;font-size:11px;
   text-transform:uppercase;letter-spacing:1px">Sayın</span><br>
   <span style="font-size:16px;font-weight:600">${kacir(musteri)}</span></p>` : ""}
 <table>${h.satirlar.map(r => `<tr><td><div class="ad">${kacir(r.ad)}</div>
 ${r.detay ? `<div class="detay">${kacir(r.detay)}</div>` : ""}</td>
-<td class="sag">${para(r.tutar)}</td></tr>`).join("")}</table>
+<td class="sag">${para(r.tutar)}</td></tr>`).join("")}
+${h.indirimSatirlari.map(r => `<tr><td><div class="ad" style="color:#0a7a3d">${kacir(r.ad)}</div>
+<div class="detay">${kacir(r.detay)}</div></td>
+<td class="sag" style="color:#0a7a3d">${para(r.tutar)}</td></tr>`).join("")}</table>
 <div class="toplamlar">
 <div class="ts"><span>Ara toplam</span><span>${para(h.ara)}</span></div>
+${h.toplamIndirim > 0 ? `<div class="ts" style="color:#0a7a3d"><span>İndirim</span><span>-${para(h.toplamIndirim)}</span></div>` : ""}
 <div class="ts"><span>KDV (%${h.kdvOrani})</span><span>${para(h.kdv)}</span></div>
+${h.tevkifEdilen > 0 ? `<div class="ts"><span>KDV Tevkifatı (${h.tevkifatOranMetin})</span><span>-${para(h.tevkifEdilen)}</span></div>` : ""}
 <div class="ts genel"><span>Genel Toplam</span><span>${para(h.genel)}</span></div></div>
 <div class="gecerli">Bu teklif <b>${son}</b> tarihine kadar geçerlidir.</div>
 <div class="kosul"><h2>Koşullar</h2><ul>${s.kosullar.map(k => `<li>${kacir(k)}</li>`).join("")}</ul></div>
@@ -300,6 +493,15 @@ if (new URLSearchParams(location.search).get("demo") === "1") {
 } else if (new URLSearchParams(location.search).get("demo") === "2") {
   durum.degerler = { alan: 85, oda: 3 };
   durum.opsiyonlar = { malzeme: true, tasima: true };
+} else if (new URLSearchParams(location.search).get("demo") === "3") {
+  durum.degerler = { mesafe: 45, hacim: 22, kat: 2 };
+  durum.opsiyonlar = { paketleme: true, sigorta: true };
+  durum.indirimler = { haftaici: true };
+} else if (new URLSearchParams(location.search).get("demo") === "4") {
+  durum.degerler = { mesafe: 45, hacim: 22, kat: 2 };
+  durum.opsiyonlar = { paketleme: true, sigorta: true };
+  durum.indirimler = { haftaici: true };
+  durum.tevkifat = true;
 }
 temaUygula();
 firmaCiz();
