@@ -194,6 +194,26 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
     <label>Adres / şehir <span style="font-weight:400">(isteğe bağlı)</span></label>
     <input type="text" id="fFirmaAdres" placeholder="Kadıköy, İstanbul" autocomplete="street-address">
   </div>
+  <div style="margin-bottom:12px">
+    <label>Vergi dairesi <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaVd" placeholder="Kadıköy V.D.">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>VKN / TCKN <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaVkn" placeholder="1234567890" inputmode="numeric">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>IBAN <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaIban" placeholder="TR00 0000 0000 0000 0000 0000 00">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>Banka / hesap sahibi <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaBanka" placeholder="Ziraat Bankası — Ahmet Yılmaz">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>Yetkili adı <span style="font-weight:400">(imza satırı için, isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaYetkili" placeholder="Ahmet Yılmaz">
+  </div>
   <div style="display:flex;gap:10px;margin-top:16px">
     <button class="ikincil" id="firmaKapat">Vazgeç</button>
     <button class="ana" id="firmaKaydet">Kaydet</button>

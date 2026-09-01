@@ -13,7 +13,7 @@ let durum = {
   indirimler: {},    // { indirimKodu: true/false }
   tevkifat: false,   // KDV tevkifati uygulansin mi
   tevkifatOran: "",  // kullanicinin sectigi oran (bos = sektor varsayilani)
-  firma: { ad: "", tel: "", mail: "", adres: "" },
+  firma: { ad: "", tel: "", mail: "", adres: "", vd: "", vkn: "", iban: "", banka: "", yetkili: "" },
   gecmis: [],        // kaydedilen teklifler
   sayac: {},         // { "2026": 7 } -> teklif numarasi
   tema: "otomatik"
@@ -83,12 +83,12 @@ function hesapla() {
       const m = Number(durum.degerler[k.kod] || 0);
       if (!m) continue;
       const f = fiyatAl(k), tutar = m * f;
-      satirlar.push({ ad: adAl(k), detay: `${m} ${k.birim} × ${para(f)}`, tutar });
+      satirlar.push({ ad: adAl(k), detay: `${m} ${k.birim} × ${para(f)}`, miktar: m, birim: k.birim, birimFiyat: f, tutar });
       ara += tutar;
     } else if (k.tip === "opsiyon") {
       if (!durum.opsiyonlar[k.kod]) continue;
       const tutar = fiyatAl(k);
-      satirlar.push({ ad: adAl(k), detay: "", tutar });
+      satirlar.push({ ad: adAl(k), detay: "", miktar: 1, birim: "adet", birimFiyat: fiyatAl(k), tutar });
       ara += tutar;
     }
   }
@@ -96,7 +96,7 @@ function hesapla() {
   for (const k of s.kalemler) {
     if (k.tip !== "yuzde" || !durum.opsiyonlar[k.kod]) continue;
     const o = fiyatAl(k), tutar = ara * o / 100;
-    satirlar.push({ ad: adAl(k), detay: `%${o}`, tutar });
+    satirlar.push({ ad: adAl(k), detay: `%${o}`, miktar: "", birim: "", birimFiyat: "", tutar });
     ara += tutar;
   }
 
@@ -301,13 +301,21 @@ $("#firmaDuzenle").onclick = () => {
   $("#fFirmaTel").value = durum.firma.tel || "";
   $("#fFirmaMail").value = durum.firma.mail || "";
   $("#fFirmaAdres").value = durum.firma.adres || "";
+  $("#fFirmaVd").value = durum.firma.vd || "";
+  $("#fFirmaVkn").value = durum.firma.vkn || "";
+  $("#fFirmaIban").value = durum.firma.iban || "";
+  $("#fFirmaBanka").value = durum.firma.banka || "";
+  $("#fFirmaYetkili").value = durum.firma.yetkili || "";
   $("#firmaDlg").showModal();
 };
 $("#firmaKapat").onclick = () => $("#firmaDlg").close();
 $("#firmaKaydet").onclick = () => {
   durum.firma = {
     ad: $("#fFirmaAd").value.trim(), tel: $("#fFirmaTel").value.trim(),
-    mail: $("#fFirmaMail").value.trim(), adres: $("#fFirmaAdres").value.trim()
+    mail: $("#fFirmaMail").value.trim(), adres: $("#fFirmaAdres").value.trim(),
+    vd: $("#fFirmaVd").value.trim(), vkn: $("#fFirmaVkn").value.trim(),
+    iban: $("#fFirmaIban").value.trim(), banka: $("#fFirmaBanka").value.trim(),
+    yetkili: $("#fFirmaYetkili").value.trim()
   };
   kaydet(); $("#firmaDlg").close(); firmaCiz();
 };
@@ -439,6 +447,15 @@ Ara toplam: ${para(h.ara)}
   t += `GENEL TOPLAM: ${para(h.genel)}
 
 `;
+  if (f.iban) {
+    t += `Ödeme Bilgileri
+`;
+    if (f.banka) t += `${f.banka}
+`;
+    t += `IBAN: ${f.iban}
+
+`;
+  }
   t += `Teklif ${son} tarihine kadar geçerlidir.
 
 Koşullar:
@@ -500,16 +517,25 @@ td.sag{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media print{body{padding:0}.yazdirma-gizle{display:none}}
 </style></head><body>
 <header><div><div class="buyuk">${kacir(durum.firma.ad) || s.ikon + " " + s.ad}</div>
-<div style="color:#666;font-size:13px">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · ")) || "Fiyat Teklifi"}</div></div>
+<div style="color:#666;font-size:13px">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · ")) || "Fiyat Teklifi"}</div>
+${(durum.firma.vd || durum.firma.vkn) ? `<div style="color:#888;font-size:12px;margin-top:2px">${kacir([durum.firma.vd, durum.firma.vkn && ("VKN: " + durum.firma.vkn)].filter(Boolean).join(" · "))}</div>` : ""}</div>
 <div style="text-align:right;font-size:13px;color:#666">Teklif No: ${no}<br>${bugun}</div></header>
 ${musteri ? `<p style="margin:0 0 20px"><span style="color:#888;font-size:11px;
   text-transform:uppercase;letter-spacing:1px">Sayın</span><br>
   <span style="font-size:16px;font-weight:600">${kacir(musteri)}</span></p>` : ""}
-<table>${h.satirlar.map(r => `<tr><td><div class="ad">${kacir(r.ad)}</div>
-${r.detay ? `<div class="detay">${kacir(r.detay)}</div>` : ""}</td>
+<table>
+<thead><tr>
+<th style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Hizmet</th>
+<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Miktar</th>
+<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Birim Fiyat</th>
+<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Tutar</th>
+</tr></thead>
+${h.satirlar.map(r => `<tr><td><div class="ad">${kacir(r.ad)}</div></td>
+<td class="sag">${r.miktar !== "" ? kacir(String(r.miktar) + " " + (r.birim || "")) : kacir(r.detay)}</td>
+<td class="sag">${r.birimFiyat !== "" ? para(r.birimFiyat) : ""}</td>
 <td class="sag">${para(r.tutar)}</td></tr>`).join("")}
-${h.indirimSatirlari.map(r => `<tr><td><div class="ad" style="color:#0a7a3d">${kacir(r.ad)}</div>
-<div class="detay">${kacir(r.detay)}</div></td>
+${h.indirimSatirlari.map(r => `<tr><td><div class="ad" style="color:#0a7a3d">${kacir(r.ad)}</div></td>
+<td class="sag" style="color:#0a7a3d">${kacir(r.detay)}</td><td></td>
 <td class="sag" style="color:#0a7a3d">${para(r.tutar)}</td></tr>`).join("")}</table>
 <div class="toplamlar">
 <div class="ts"><span>Ara toplam</span><span>${para(h.ara)}</span></div>
@@ -518,7 +544,16 @@ ${h.toplamIndirim > 0 ? `<div class="ts" style="color:#0a7a3d"><span>İndirim</s
 ${h.tevkifEdilen > 0 ? `<div class="ts"><span>KDV Tevkifatı (${h.tevkifatOranMetin})</span><span>-${para(h.tevkifEdilen)}</span></div>` : ""}
 <div class="ts genel"><span>Genel Toplam</span><span>${para(h.genel)}</span></div></div>
 <div class="gecerli">Bu teklif <b>${son}</b> tarihine kadar geçerlidir.</div>
+${durum.firma.iban ? `<div class="kosul"><h2>Ödeme Bilgileri</h2>
+<div style="font-size:13px;color:#333">${kacir(durum.firma.banka || "")}${durum.firma.banka ? "<br>" : ""}
+<b>IBAN:</b> ${kacir(durum.firma.iban)}</div></div>` : ""}
 <div class="kosul"><h2>Koşullar</h2><ul>${s.kosullar.map(k => `<li>${kacir(k)}</li>`).join("")}</ul></div>
+<div style="margin-top:34px;display:flex;justify-content:space-between;gap:40px">
+<div style="flex:1"><div style="border-top:1px solid #999;padding-top:6px;font-size:12px;color:#666">
+Teklifi veren${durum.firma.yetkili ? "<br><b style=\"color:#111\">" + kacir(durum.firma.yetkili) + "</b>" : ""}</div></div>
+<div style="flex:1"><div style="border-top:1px solid #999;padding-top:6px;font-size:12px;color:#666">
+Kabul eden${musteri ? "<br><b style=\"color:#111\">" + kacir(musteri) + "</b>" : ""}</div></div>
+</div>
 <p class="yazdirma-gizle" style="margin-top:28px;text-align:center">
 <button onclick="window.print()" style="padding:13px 26px;font-size:15px;font-weight:600;
   background:#111;color:#fff;border:none;border-radius:11px;cursor:pointer">
@@ -551,6 +586,10 @@ firmaCiz();
 ciz();
 
 // test: ?ac=firma ile firma penceresini otomatik ac
+if (new URLSearchParams(location.search).get("belge") === "1") {
+  $("#musteri").value = "Mehmet Demir";
+  setTimeout(() => $("#teklifBtn").click(), 100);
+}
 if (new URLSearchParams(location.search).get("ac") === "firma") {
   $("#firmaDuzenle").click();
 }
