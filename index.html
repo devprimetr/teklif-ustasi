@@ -92,8 +92,11 @@ button.ana{background:var(--vurgu);color:var(--vurgu-metin)}
 button.ikincil{background:var(--bg);color:var(--metin);border:1px solid var(--cizgi)}
 button:active{transform:scale(.98)}
 .ipucu{font-size:12px;color:var(--soluk);margin-top:8px;line-height:1.45}
-.duzenle{background:none;border:none;color:var(--soluk);font-size:12px;
-  text-decoration:underline;cursor:pointer;padding:0;font-family:inherit}
+.duzenle{background:var(--bg);border:1px solid var(--cizgi);color:var(--vurgu);
+  font-size:12px;font-weight:600;cursor:pointer;padding:5px 11px;border-radius:8px;
+  font-family:inherit;text-transform:none;letter-spacing:0}
+.duzenle:active{transform:scale(.96)}
+.kart h2{display:flex;align-items:center;justify-content:space-between;gap:10px}
 dialog{border:none;border-radius:18px;padding:0;max-width:520px;width:calc(100% - 32px);
   background:var(--kart);color:var(--metin)}
 dialog::backdrop{background:rgba(0,0,0,.55)}
@@ -125,7 +128,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   </div>
 
   <div class="kart yazdirma-gizle">
-    <h2>Firma <button class="duzenle" id="firmaDuzenle">bilgilerimi düzenle</button></h2>
+    <h2>Firma Bilgilerim <button class="duzenle" id="firmaDuzenle">Düzenle</button></h2>
     <div id="firmaOzet" style="font-size:15px;font-weight:600"></div>
     <div id="firmaAlt" class="ipucu" style="margin-top:2px"></div>
   </div>
@@ -136,7 +139,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   </div>
 
   <div class="kart yazdirma-gizle">
-    <h2>Hesap <button class="duzenle" id="fiyatDuzenle">fiyatları düzenle</button></h2>
+    <h2>Hizmet Kalemleri <button class="duzenle" id="fiyatDuzenle">Fiyatları düzenle</button></h2>
     <div id="kalemler"></div>
   </div>
 

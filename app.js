@@ -643,6 +643,9 @@ if (new URLSearchParams(location.search).get("belge") === "1") {
   $("#musteri").value = "Mehmet Demir";
   setTimeout(() => $("#teklifBtn").click(), 100);
 }
+if (new URLSearchParams(location.search).get("ac") === "fiyat") {
+  $("#fiyatDuzenle").click();
+}
 if (new URLSearchParams(location.search).get("ac") === "firma") {
   $("#firmaDuzenle").click();
 }
