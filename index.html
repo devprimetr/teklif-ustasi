@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Teklif Ustası</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f6f7f9; --kart:#fff; --metin:#0f172a; --soluk:#64748b;
+  --cizgi:#e2e8f0; --vurgu:#0f172a; --vurgu-metin:#fff;
+  --yesil:#0a7a3d; --kirmizi:#b42318; --girdi:#fff;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-tema="acik"]){
+    --bg:#0b1220; --kart:#111a2b; --metin:#e8eefc; --soluk:#94a3b8;
+    --cizgi:#1e293b; --vurgu:#e8eefc; --vurgu-metin:#0b1220;
+    --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1829;
+  }
+}
+:root[data-tema="koyu"]{
+  --bg:#0b1220; --kart:#111a2b; --metin:#e8eefc; --soluk:#94a3b8;
+  --cizgi:#1e293b; --vurgu:#e8eefc; --vurgu-metin:#0b1220;
+  --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1829;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--metin);
+  font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
+  font-size:16px;line-height:1.5;padding-bottom:96px}
+.ust{position:sticky;top:0;z-index:20;background:var(--kart);
+  border-bottom:1px solid var(--cizgi);padding:14px 16px;
+  padding-top:calc(14px + env(safe-area-inset-top));
+  display:flex;align-items:center;gap:12px}
+.ust h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.2px;flex:1}
+.ust button{background:none;border:none;color:var(--soluk);font-size:20px;
+  cursor:pointer;padding:4px 8px;border-radius:8px}
+.sar{max-width:640px;margin:0 auto;padding:16px}
+.kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:16px;
+  padding:16px;margin-bottom:14px}
+.kart h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--soluk);margin:0 0 12px;font-weight:700}
+.sektorler{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.sektor{background:var(--bg);border:2px solid var(--cizgi);border-radius:14px;
+  padding:12px 6px;text-align:center;cursor:pointer;transition:.12s;font-size:12px;
+  font-weight:600;color:var(--metin)}
+.sektor:active{transform:scale(.96)}
+.sektor.secili{border-color:var(--vurgu);background:var(--vurgu);color:var(--vurgu-metin)}
+.sektor .ikon{display:block;font-size:26px;margin-bottom:4px}
+label{display:block;font-size:13px;color:var(--soluk);margin-bottom:5px;font-weight:600}
+input[type=text],input[type=number]{width:100%;padding:13px 14px;font-size:16px;
+  border:1px solid var(--cizgi);border-radius:12px;background:var(--girdi);
+  color:var(--metin);font-family:inherit}
+input:focus{outline:2px solid var(--vurgu);outline-offset:-1px}
+.satir{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.satir .bilgi{flex:1;min-width:0}
+.satir .bilgi .ad{font-weight:600;font-size:15px}
+.satir .bilgi .fiyat{font-size:12px;color:var(--soluk)}
+.satir input[type=number]{width:104px;flex:none;text-align:right}
+.anahtar{position:relative;width:52px;height:31px;flex:none}
+.anahtar input{opacity:0;width:0;height:0;position:absolute}
+.kaydir{position:absolute;inset:0;background:var(--cizgi);border-radius:31px;
+  cursor:pointer;transition:.2s}
+.kaydir:before{content:"";position:absolute;width:25px;height:25px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.anahtar input:checked+.kaydir{background:var(--yesil)}
+.anahtar input:checked+.kaydir:before{transform:translateX(21px)}
+.toplam-kart{background:var(--vurgu);color:var(--vurgu-metin);border:none}
+.toplam-kart h2{color:var(--vurgu-metin);opacity:.6}
+.tsatir{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;opacity:.75}
+.tsatir.buyuk{font-size:26px;font-weight:800;opacity:1;padding-top:12px;margin-top:8px;
+  border-top:1px solid rgba(128,128,128,.35);letter-spacing:-.5px}
+.dugmeler{position:fixed;bottom:0;left:0;right:0;background:var(--kart);
+  border-top:1px solid var(--cizgi);padding:12px 16px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:20}
+.dugmeler .ic{max-width:640px;margin:0 auto;display:flex;gap:10px;width:100%}
+button.ana,button.ikincil{flex:1;padding:15px;font-size:15px;font-weight:700;
+  border-radius:14px;border:none;cursor:pointer;font-family:inherit}
+button.ana{background:var(--vurgu);color:var(--vurgu-metin)}
+button.ikincil{background:var(--bg);color:var(--metin);border:1px solid var(--cizgi)}
+button:active{transform:scale(.98)}
+.ipucu{font-size:12px;color:var(--soluk);margin-top:8px;line-height:1.45}
+.duzenle{background:none;border:none;color:var(--soluk);font-size:12px;
+  text-decoration:underline;cursor:pointer;padding:0;font-family:inherit}
+dialog{border:none;border-radius:18px;padding:0;max-width:520px;width:calc(100% - 32px);
+  background:var(--kart);color:var(--metin)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dlg-ic{padding:20px}
+.dlg-ic h3{margin:0 0 14px;font-size:17px}
+.gizli{display:none!important}
+@media print{
+  .ust,.dugmeler,.yazdirma-gizle{display:none!important}
+  body{padding:0;background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+
+<div class="ust yazdirma-gizle">
+  <h1>Teklif Ustası</h1>
+  <button id="temaBtn" title="Tema">◐</button>
+</div>
+
+<div class="sar">
+
+  <div class="kart yazdirma-gizle">
+    <h2>Sektör</h2>
+    <div class="sektorler" id="sektorler"></div>
+  </div>
+
+  <div class="kart yazdirma-gizle">
+    <h2>Müşteri</h2>
+    <input type="text" id="musteri" placeholder="Müşteri adı" autocomplete="off">
+  </div>
+
+  <div class="kart yazdirma-gizle">
+    <h2>Hesap <button class="duzenle" id="fiyatDuzenle">fiyatları düzenle</button></h2>
+    <div id="kalemler"></div>
+  </div>
+
+  <div class="kart toplam-kart">
+    <h2>Toplam</h2>
+    <div class="tsatir"><span>Ara toplam</span><span id="araToplam">0 ₺</span></div>
+    <div class="tsatir"><span id="kdvEtiket">KDV</span><span id="kdv">0 ₺</span></div>
+    <div class="tsatir buyuk"><span>Genel</span><span id="genel">0 ₺</span></div>
+  </div>
+
+  <p class="ipucu yazdirma-gizle">
+    Fiyatlar telefonunuzda saklanır, hiçbir yere gönderilmez.
+    İnternet olmadan da çalışır.
+  </p>
+
+</div>
+
+<div class="dugmeler yazdirma-gizle">
+  <div class="ic">
+    <button class="ikincil" id="paylasBtn">Paylaş</button>
+    <button class="ana" id="teklifBtn">Teklif Oluştur</button>
+  </div>
+</div>
+
+<dialog id="fiyatDlg"><div class="dlg-ic">
+  <h3>Fiyatları Düzenle</h3>
+  <div id="fiyatAlanlari"></div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="ikincil" id="fiyatKapat">Vazgeç</button>
+    <button class="ana" id="fiyatKaydet">Kaydet</button>
+  </div>
+</div></dialog>
+
+<script src="sektorler.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
