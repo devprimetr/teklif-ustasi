@@ -110,6 +110,12 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   </div>
 
   <div class="kart yazdirma-gizle">
+    <h2>Firma <button class="duzenle" id="firmaDuzenle">bilgilerimi düzenle</button></h2>
+    <div id="firmaOzet" style="font-size:15px;font-weight:600"></div>
+    <div id="firmaAlt" class="ipucu" style="margin-top:2px"></div>
+  </div>
+
+  <div class="kart yazdirma-gizle">
     <h2>Müşteri</h2>
     <input type="text" id="musteri" placeholder="Müşteri adı" autocomplete="off">
   </div>
@@ -141,11 +147,39 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 </div>
 
 <dialog id="fiyatDlg"><div class="dlg-ic">
-  <h3>Fiyatları Düzenle</h3>
-  <div id="fiyatAlanlari"></div>
+  <h3>Kalemleri Düzenle</h3>
+  <p class="ipucu" style="margin:-6px 0 14px">Kalem adını ve fiyatını
+    değiştirebilirsiniz. Değişiklikler telefonunuzda saklanır.</p>
+  <div id="fiyatAlanlari" style="max-height:56vh;overflow-y:auto"></div>
   <div style="display:flex;gap:10px;margin-top:16px">
     <button class="ikincil" id="fiyatKapat">Vazgeç</button>
     <button class="ana" id="fiyatKaydet">Kaydet</button>
+  </div>
+</div></dialog>
+
+<dialog id="firmaDlg"><div class="dlg-ic">
+  <h3>Firma Bilgilerim</h3>
+  <p class="ipucu" style="margin:-6px 0 14px">Bu bilgiler teklif belgesinin
+    başlığında görünür. Sadece telefonunuzda saklanır.</p>
+  <div style="margin-bottom:12px">
+    <label>Firma adı</label>
+    <input type="text" id="fFirmaAd" placeholder="Örn. Aksu Nakliyat" autocomplete="organization">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>Telefon</label>
+    <input type="text" id="fFirmaTel" placeholder="05XX XXX XX XX" inputmode="tel" autocomplete="tel">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>E-posta <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaMail" placeholder="info@firma.com" inputmode="email" autocomplete="email">
+  </div>
+  <div style="margin-bottom:12px">
+    <label>Adres / şehir <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <input type="text" id="fFirmaAdres" placeholder="Kadıköy, İstanbul" autocomplete="street-address">
+  </div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="ikincil" id="firmaKapat">Vazgeç</button>
+    <button class="ana" id="firmaKaydet">Kaydet</button>
   </div>
 </div></dialog>
 

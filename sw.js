@@ -1,7 +1,7 @@
 // Service worker — uygulamanin internetsiz calismasini saglar.
-const ONBELLEK = "teklif-ustasi-v1";
+const ONBELLEK = "teklif-ustasi-v2";
 const DOSYALAR = ["./", "./index.html", "./app.js", "./sektorler.js",
-                  "./manifest.json", "./icon-192.png", "./icon-512.png"];
+                  "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-512-maskable.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(ONBELLEK).then(c => c.addAll(DOSYALAR)).then(() => self.skipWaiting()));
