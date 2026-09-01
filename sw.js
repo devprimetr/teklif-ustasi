@@ -1,5 +1,5 @@
 // Service worker — uygulamanin internetsiz calismasini saglar.
-const ONBELLEK = "teklif-ustasi-v14";
+const ONBELLEK = "teklif-ustasi-v15";
 const DOSYALAR = ["./", "./index.html", "./app.js", "./sektorler.js",
                   "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-512-maskable.png"];
 
