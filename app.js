@@ -398,6 +398,7 @@ function gecmiseKaydet(no, musteri, h) {
     sektorAd: SEKTORLER[durum.sektor].ad,
     tarih: new Date().toISOString().slice(0, 10),
     genel: h.genel,
+    durum: "bekliyor",   // bekliyor | kabul | red
     degerler: { ...durum.degerler },
     opsiyonlar: { ...durum.opsiyonlar },
     indirimler: { ...durum.indirimler }
@@ -405,6 +406,96 @@ function gecmiseKaydet(no, musteri, h) {
   // en fazla 200 kayit tut - localStorage sinirina takilmasin
   if (durum.gecmis.length > 200) durum.gecmis.length = 200;
   kaydet();
+}
+
+/* Ana ekran ozeti: bu ayin toplami ve teklif sayisi.
+   Durum bilinmiyorsa "bekliyor" sayilir - bilinmeyen aksiyon uretmez,
+   sadece bekleme durumudur (bkz. eksik-veri-isleme yetenegi). */
+function ozetHesapla() {
+  const simdi = new Date(), ay = simdi.getMonth(), yil = simdi.getFullYear();
+  const buAy = durum.gecmis.filter(g => {
+    const t = new Date(g.tarih);
+    return t.getMonth() === ay && t.getFullYear() === yil;
+  });
+  const kabul = buAy.filter(g => g.durum === "kabul");
+  return {
+    adet: buAy.length,
+    toplam: buAy.reduce((a, g) => a + (g.genel || 0), 0),
+    kabulAdet: kabul.length,
+    kabulTutar: kabul.reduce((a, g) => a + (g.genel || 0), 0)
+  };
+}
+
+const DURUM_ETIKET = { bekliyor: "Bekliyor", kabul: "Kabul", red: "Red" };
+
+function anaListeCiz() {
+  const o = ozetHesapla();
+  $("#ozetTutar").textContent = para(o.toplam);
+  $("#ozetAdet").textContent = o.adet;
+  $("#ozetKabul").textContent = o.kabulAdet ? `${o.kabulAdet} kabul · ${para(o.kabulTutar)}` : "Henüz kabul yok";
+
+  const liste = durum.gecmis;
+  $("#anaListe").innerHTML = liste.length
+    ? liste.slice(0, 40).map((g, i) => {
+        const d = g.durum || "bekliyor";
+        return `<div class="tkart" data-t="${i}">
+          <div class="sol">
+            <div class="ad">${kacir(g.musteri) || "(müşteri adı yok)"}</div>
+            <div class="no">${g.no} · ${kacir(g.sektorAd)} · ${g.tarih.split("-").reverse().join(".")}</div>
+          </div>
+          <div class="sag">
+            <div class="tut">${para(g.genel)}</div>
+            <span class="rozet ${d}">${DURUM_ETIKET[d]}</span>
+          </div></div>`;
+      }).join("")
+    : `<div class="bos">
+         <div class="bos-b">Henüz teklif yok</div>
+         <div class="bos-a">Aşağıdaki + düğmesiyle ilk teklifinizi hazırlayın.</div>
+       </div>`;
+
+  $("#anaListe").querySelectorAll(".tkart").forEach(el => {
+    el.onclick = () => teklifAc(Number(el.dataset.t));
+  });
+}
+
+/* Teklife dokununca: durum degistir veya geri yukle */
+function teklifAc(i) {
+  const g = durum.gecmis[i];
+  const secim = prompt(
+    `${g.musteri || "(isimsiz)"} · ${g.no}
+${para(g.genel)}
+
+` +
+    `1 = Kabul edildi
+2 = Reddedildi
+3 = Bekliyor
+4 = Bu teklifi geri yükle`, "");
+  if (!secim) return;
+  if (secim === "4") {
+    durum.sektor = g.sektor;
+    durum.degerler = { ...g.degerler };
+    durum.opsiyonlar = { ...g.opsiyonlar };
+    durum.indirimler = { ...(g.indirimler || {}) };
+    $("#musteri").value = g.musteri;
+    kaydet(); ciz(); ekranGoster("hesap");
+    return;
+  }
+  const m = { "1": "kabul", "2": "red", "3": "bekliyor" }[secim];
+  if (m) { g.durum = m; kaydet(); anaListeCiz(); }
+}
+
+/* Ekran gecisi: ana liste <-> hesap */
+function ekranGoster(hangi) {
+  const ana = hangi === "ana";
+  $("#ekranAna").hidden = !ana;
+  $("#ekranHesap").hidden = ana;
+  $("#ustBaslik").textContent = ana ? "Tekliflerim" : "Yeni Teklif";
+  $("#dugmeAna").hidden = !ana;
+  $("#dugmeHesap").hidden = ana;
+  $("#geriBtn").hidden = ana;
+  $("#gecmisAc").hidden = !ana;
+  if (ana) anaListeCiz();
+  window.scrollTo({ top: 0 });
 }
 
 function gecmisCiz() {
@@ -437,6 +528,12 @@ function gecmisCiz() {
 }
 
 $("#gecmisAc").onclick = () => { gecmisCiz(); $("#gecmisDlg").showModal(); };
+$("#yeniBtn").onclick = () => {
+  durum.degerler = {}; durum.opsiyonlar = {}; durum.indirimler = {};
+  $("#musteri").value = "";
+  ciz(); ekranGoster("hesap");
+};
+$("#geriBtn").onclick = () => ekranGoster("ana");
 $("#gecmisKapat").onclick = () => $("#gecmisDlg").close();
 $("#gecmisTemizle").onclick = () => {
   if (!durum.gecmis.length) return;
@@ -541,6 +638,7 @@ $("#teklifBtn").onclick = () => {
   const musteri = $("#musteri").value.trim();
   const no = sonrakiNo();
   gecmiseKaydet(no, musteri, h);
+  setTimeout(() => ekranGoster("ana"), 400);
   const bugun = new Date().toLocaleDateString("tr-TR");
   const son = new Date(Date.now() + 14 * 864e5).toLocaleDateString("tr-TR");
 
@@ -639,6 +737,7 @@ if (new URLSearchParams(location.search).get("demo") === "1") {
 temaUygula();
 firmaCiz();
 ciz();
+ekranGoster("ana");
 
 // test: ?ac=firma ile firma penceresini otomatik ac
 if (new URLSearchParams(location.search).get("belge") === "1") {

@@ -36,6 +36,8 @@
   --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0e1722;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* display:flex/grid, [hidden] varsayilanini eziyor - !important sart */
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--metin);
   font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
   font-size:16px;line-height:1.5;padding-bottom:96px}
@@ -104,6 +106,32 @@ dialog{border:none;border-radius:18px;padding:0;max-width:520px;width:calc(100% 
 dialog::backdrop{background:rgba(0,0,0,.55)}
 .dlg-ic{padding:20px}
 .dlg-ic h3{margin:0 0 14px;font-size:17px}
+.ozet-kart{background:var(--vurgu);color:var(--vurgu-metin);border-radius:16px;
+  padding:20px 22px;margin-bottom:16px;display:flex;justify-content:space-between;
+  align-items:flex-start;box-shadow:0 8px 24px rgba(17,55,105,.18)}
+.ozet-k{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;opacity:.7;font-weight:700}
+.ozet-b{font-size:30px;font-weight:800;letter-spacing:-.8px;margin-top:3px}
+.ozet-alt{font-size:13px;opacity:.75;margin-top:5px}
+.tkart{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;
+  padding:15px 17px;margin-bottom:10px;display:flex;justify-content:space-between;
+  align-items:center;gap:12px;cursor:pointer;transition:.12s}
+.tkart:active{transform:scale(.985)}
+.tkart .sol{min-width:0;flex:1}
+.tkart .ad{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tkart .no{color:var(--soluk);font-size:12.5px;margin-top:3px}
+.tkart .sag{text-align:right;white-space:nowrap}
+.tkart .tut{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.rozet{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  margin-top:5px;display:inline-block}
+.rozet.kabul{background:#dcf5e6;color:#0a7a3d}
+.rozet.bekliyor{background:#fff2d6;color:#8a5a00}
+.rozet.red{background:#fde4e2;color:#b42318}
+:root[data-tema="koyu"] .rozet.kabul,
+@media (prefers-color-scheme:dark){:root:not([data-tema="acik"]) .rozet.kabul{background:#0f3d24;color:#4ade80}}
+.bos{text-align:center;padding:56px 24px;color:var(--soluk)}
+.bos-b{font-size:17px;font-weight:700;color:var(--metin);margin-bottom:6px}
+.bos-a{font-size:14px;line-height:1.5}
+button.buyuk{font-size:16px;padding:16px}
 .gsatir{display:flex;gap:10px;align-items:center;padding:11px 0;
   border-bottom:1px solid var(--cizgi)}
 .gsatir:last-child{border-bottom:none}
@@ -117,7 +145,11 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 <body>
 
 <div class="ust yazdirma-gizle"><div class="ust-ic">
-  <h1>Teklif Ustası</h1>
+  <button id="geriBtn" title="Geri" aria-label="Geri" hidden>
+    <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/></svg></button>
+  <h1 id="ustBaslik">Tekliflerim</h1>
   <button id="gecmisAc" title="Geçmiş" aria-label="Geçmiş teklifler">
     <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
       stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -131,6 +163,23 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 </div></div>
 
 <div class="sar">
+
+<div id="ekranAna">
+  <div class="ozet-kart">
+    <div>
+      <div class="ozet-k">Bu ay</div>
+      <div class="ozet-b" id="ozetTutar">0 ₺</div>
+      <div class="ozet-alt" id="ozetKabul">Henüz kabul yok</div>
+    </div>
+    <div style="text-align:right">
+      <div class="ozet-k">Teklif</div>
+      <div class="ozet-b" id="ozetAdet">0</div>
+    </div>
+  </div>
+  <div id="anaListe"></div>
+</div>
+
+<div id="ekranHesap" hidden>
 
   <div class="kart yazdirma-gizle">
     <h2>Sektör</h2>
@@ -168,9 +217,13 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   </p>
 
 </div>
+</div>
 
 <div class="dugmeler yazdirma-gizle">
-  <div class="ic">
+  <div class="ic" id="dugmeAna">
+    <button class="ana buyuk" id="yeniBtn">+ &nbsp;Yeni Teklif</button>
+  </div>
+  <div class="ic" id="dugmeHesap" hidden>
     <button class="ikincil" id="paylasBtn">Paylaş</button>
     <button class="ana" id="teklifBtn">Teklif Oluştur</button>
   </div>
