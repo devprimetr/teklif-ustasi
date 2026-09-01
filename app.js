@@ -646,70 +646,131 @@ $("#teklifBtn").onclick = () => {
   if (!w) { alert("Açılır pencere engellendi. Paylaş düğmesini kullanın."); return; }
   w.document.write(`<!doctype html><html lang="tr"><head><meta charset="utf-8">
 <title>Teklif${musteri ? " — " + kacir(musteri) : ""}</title><style>
-@page{size:A4;margin:18mm 16mm}
-body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;color:#111;line-height:1.5;
-  max-width:760px;margin:0 auto;padding:28px 20px;font-size:14px}
-header{display:flex;justify-content:space-between;align-items:flex-start;
-  border-bottom:3px solid #111;padding-bottom:14px;margin-bottom:24px}
-h1{font-size:14px;letter-spacing:2px;text-transform:uppercase;margin:0;color:#666}
-.buyuk{font-size:21px;font-weight:700}
-table{width:100%;border-collapse:collapse;margin-bottom:8px}
-td{padding:11px 0;border-bottom:1px solid #eee;vertical-align:top}
+@page{size:A4;margin:14mm 13mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;color:#151d28;line-height:1.5;
+  max-width:780px;margin:0 auto;padding:32px 26px;font-size:13.5px;background:#fff}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;
+  padding-bottom:20px;margin-bottom:26px;border-bottom:1px solid #dae0e7}
+.buyuk{font-size:22px;font-weight:800;letter-spacing:-.4px;color:#113769}
+.firma-alt{color:#495e79;font-size:12.5px;margin-top:3px}
+.firma-vd{color:#8a97a8;font-size:11.5px;margin-top:2px}
+.belge-tip{text-align:right;flex:none}
+.belge-tip .etiket{display:inline-block;background:#113769;color:#fff;font-size:10.5px;
+  letter-spacing:2px;text-transform:uppercase;padding:6px 13px;border-radius:5px;font-weight:700}
+.belge-tip .no{font-size:16px;font-weight:800;margin-top:9px;color:#113769;
+  font-variant-numeric:tabular-nums}
+.belge-tip .tarih{font-size:12px;color:#8a97a8;margin-top:2px}
+.taraflar{display:flex;gap:28px;margin-bottom:22px}
+.taraf{flex:1;background:#f5f7f9;border-radius:9px;padding:13px 15px}
+.taraf .k{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;color:#8a97a8;font-weight:700}
+.taraf .v{font-size:15px;font-weight:700;margin-top:3px}
+table{width:100%;border-collapse:collapse;margin-bottom:6px}
+thead th{background:#113769;color:#fff;font-size:10px;text-transform:uppercase;
+  letter-spacing:1.2px;padding:10px 12px;font-weight:700;text-align:left}
+thead th:first-child{border-radius:7px 0 0 7px}
+thead th:last-child{border-radius:0 7px 7px 0;text-align:right}
+thead th.sag{text-align:right}
+tbody td{padding:12px;border-bottom:1px solid #eef1f4;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
 td.sag{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-.ad{font-weight:600}.detay{color:#666;font-size:12.5px}
-.toplamlar{margin-left:auto;width:300px;margin-top:14px}
-.ts{display:flex;justify-content:space-between;padding:6px 0;color:#555}
-.ts.genel{border-top:2px solid #111;margin-top:8px;padding-top:11px;
-  font-size:19px;font-weight:700;color:#111}
-.gecerli{margin-top:22px;padding:12px 14px;background:#f6f6f4;border-left:3px solid #111}
-.kosul{margin-top:26px;padding-top:16px;border-top:1px solid #eee}
-.kosul h2{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:0 0 8px}
-.kosul li{font-size:12.5px;color:#444;margin-bottom:4px}
+.ad{font-weight:600}.detay{color:#8a97a8;font-size:12px;margin-top:2px}
+.ind td{color:#0a7a3d}
+.toplamlar{margin-left:auto;width:320px;margin-top:16px;background:#f5f7f9;
+  border-radius:10px;padding:14px 16px}
+.ts{display:flex;justify-content:space-between;padding:5px 0;color:#495e79;font-size:13px}
+.ts span:last-child{font-variant-numeric:tabular-nums}
+.ts.genel{border-top:2px solid #113769;margin-top:9px;padding-top:11px;
+  font-size:19px;font-weight:800;color:#113769}
+.gecerli{margin-top:22px;padding:12px 15px;background:#fff8e6;border-left:4px solid #d9a441;
+  border-radius:0 7px 7px 0;font-size:13px}
+.kosul{margin-top:24px;padding-top:16px;border-top:1px solid #eef1f4}
+.kosul h2{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;color:#8a97a8;
+  margin:0 0 9px;font-weight:700}
+.kosul ul{padding-left:17px}
+.kosul li{font-size:12.5px;color:#495e79;margin-bottom:4px}
+.odeme{margin-top:20px;padding:13px 15px;background:#f0f5fa;border-radius:9px;
+  border:1px solid #d9e4f0}
+.odeme h2{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;color:#113769;
+  margin:0 0 6px;font-weight:700}
+.imzalar{margin-top:40px;display:flex;justify-content:space-between;gap:44px}
+.imza{flex:1}
+.imza .cizgi{border-top:1px solid #b9c4d1;padding-top:7px;font-size:11.5px;color:#8a97a8}
+.imza b{color:#151d28;font-size:13px}
+footer{margin-top:30px;padding-top:13px;border-top:1px solid #eef1f4;
+  display:flex;justify-content:space-between;font-size:11px;color:#b0bac6}
 @media print{body{padding:0}.yazdirma-gizle{display:none}}
 </style></head><body>
-<header><div style="display:flex;gap:14px;align-items:flex-start">
-${durum.firma.logo ? `<img src="${durum.firma.logo}" alt="" style="max-width:72px;max-height:72px;object-fit:contain">` : ""}
-<div><div class="buyuk">${kacir(durum.firma.ad) || "Fiyat Teklifi"}</div>
-<div style="color:#666;font-size:13px">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · ")) || "Fiyat Teklifi"}</div>
-${(durum.firma.vd || durum.firma.vkn) ? `<div style="color:#888;font-size:12px;margin-top:2px">${kacir([durum.firma.vd, durum.firma.vkn && ("VKN: " + durum.firma.vkn)].filter(Boolean).join(" · "))}</div>` : ""}</div></div>
-<div style="text-align:right;font-size:13px;color:#666">Teklif No: ${no}<br>${bugun}</div></header>
-${musteri ? `<p style="margin:0 0 20px"><span style="color:#888;font-size:11px;
-  text-transform:uppercase;letter-spacing:1px">Sayın</span><br>
-  <span style="font-size:16px;font-weight:600">${kacir(musteri)}</span></p>` : ""}
-<table>
-<thead><tr>
-<th style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Hizmet</th>
-<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Miktar</th>
-<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Birim Fiyat</th>
-<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;border-bottom:1px solid #ddd;padding-bottom:7px">Tutar</th>
-</tr></thead>
-${h.satirlar.map(r => `<tr><td><div class="ad">${kacir(r.ad)}</div></td>
-<td class="sag">${r.miktar !== "" ? kacir(String(r.miktar) + " " + (r.birim || "")) : kacir(r.detay)}</td>
-<td class="sag">${r.birimFiyat !== "" ? para(r.birimFiyat) : ""}</td>
-<td class="sag">${para(r.tutar)}</td></tr>`).join("")}
-${h.indirimSatirlari.map(r => `<tr><td><div class="ad" style="color:#0a7a3d">${kacir(r.ad)}</div></td>
-<td class="sag" style="color:#0a7a3d">${kacir(r.detay)}</td><td></td>
-<td class="sag" style="color:#0a7a3d">${para(r.tutar)}</td></tr>`).join("")}</table>
-<div class="toplamlar">
-<div class="ts"><span>Ara toplam</span><span>${para(h.ara)}</span></div>
-${h.toplamIndirim > 0 ? `<div class="ts" style="color:#0a7a3d"><span>İndirim</span><span>-${para(h.toplamIndirim)}</span></div>` : ""}
-<div class="ts"><span>KDV (%${h.kdvOrani})</span><span>${para(h.kdv)}</span></div>
-${h.tevkifEdilen > 0 ? `<div class="ts"><span>KDV Tevkifatı (${h.tevkifatOranMetin})</span><span>-${para(h.tevkifEdilen)}</span></div>` : ""}
-<div class="ts genel"><span>Genel Toplam</span><span>${para(h.genel)}</span></div></div>
-<div class="gecerli">Bu teklif <b>${son}</b> tarihine kadar geçerlidir.</div>
-${durum.firma.iban ? `<div class="kosul"><h2>Ödeme Bilgileri</h2>
-<div style="font-size:13px;color:#333">${kacir(durum.firma.banka || "")}${durum.firma.banka ? "<br>" : ""}
-<b>IBAN:</b> ${kacir(durum.firma.iban)}</div></div>` : ""}
-<div class="kosul"><h2>Koşullar</h2><ul>${s.kosullar.map(k => `<li>${kacir(k)}</li>`).join("")}</ul></div>
-<div style="margin-top:34px;display:flex;justify-content:space-between;gap:40px">
-<div style="flex:1"><div style="border-top:1px solid #999;padding-top:6px;font-size:12px;color:#666">
-Teklifi veren${durum.firma.yetkili ? "<br><b style=\"color:#111\">" + kacir(durum.firma.yetkili) + "</b>" : ""}</div></div>
-<div style="flex:1"><div style="border-top:1px solid #999;padding-top:6px;font-size:12px;color:#666">
-Kabul eden${musteri ? "<br><b style=\"color:#111\">" + kacir(musteri) + "</b>" : ""}</div></div>
+<header>
+  <div style="display:flex;gap:15px;align-items:flex-start">
+    ${durum.firma.logo ? `<img src="${durum.firma.logo}" alt="" style="max-width:74px;max-height:74px;object-fit:contain;border-radius:6px">` : ""}
+    <div>
+      <div class="buyuk">${kacir(durum.firma.ad) || "Fiyat Teklifi"}</div>
+      <div class="firma-alt">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · "))}</div>
+      ${(durum.firma.vd || durum.firma.vkn) ? `<div class="firma-vd">${kacir([durum.firma.vd, durum.firma.vkn && ("VKN: " + durum.firma.vkn)].filter(Boolean).join(" · "))}</div>` : ""}
+    </div>
+  </div>
+  <div class="belge-tip">
+    <span class="etiket">Fiyat Teklifi</span>
+    <div class="no">${no}</div>
+    <div class="tarih">${bugun}</div>
+  </div>
+</header>
+
+<div class="taraflar">
+  <div class="taraf"><div class="k">Sayın</div>
+    <div class="v">${kacir(musteri) || "—"}</div></div>
+  <div class="taraf"><div class="k">Hizmet</div>
+    <div class="v">${kacir(s.ad)}</div></div>
 </div>
-<p class="yazdirma-gizle" style="margin-top:28px;text-align:center">
-<button onclick="window.print()" style="padding:13px 26px;font-size:15px;font-weight:600;
-  background:#111;color:#fff;border:none;border-radius:11px;cursor:pointer">
+
+<table>
+  <thead><tr>
+    <th>Hizmet</th><th class="sag">Miktar</th>
+    <th class="sag">Birim Fiyat</th><th class="sag">Tutar</th>
+  </tr></thead>
+  <tbody>
+  ${h.satirlar.map(r => `<tr>
+    <td><div class="ad">${kacir(r.ad)}</div>${r.detay && r.miktar === "" ? `<div class="detay">${kacir(r.detay)}</div>` : ""}</td>
+    <td class="sag">${r.miktar !== "" ? kacir(String(r.miktar) + " " + (r.birim || "")) : kacir(r.detay)}</td>
+    <td class="sag">${r.birimFiyat !== "" ? para(r.birimFiyat) : "—"}</td>
+    <td class="sag">${para(r.tutar)}</td></tr>`).join("")}
+  ${h.indirimSatirlari.map(r => `<tr class="ind">
+    <td><div class="ad">${kacir(r.ad)}</div></td>
+    <td class="sag">${kacir(r.detay)}</td><td class="sag">—</td>
+    <td class="sag">${para(r.tutar)}</td></tr>`).join("")}
+  </tbody>
+</table>
+
+<div class="toplamlar">
+  <div class="ts"><span>Ara toplam</span><span>${para(h.ara)}</span></div>
+  ${h.toplamIndirim > 0 ? `<div class="ts" style="color:#0a7a3d"><span>İndirim</span><span>-${para(h.toplamIndirim)}</span></div>
+  <div class="ts"><span>Net tutar</span><span>${para(h.net)}</span></div>` : ""}
+  <div class="ts"><span>KDV (%${h.kdvOrani})</span><span>${para(h.kdv)}</span></div>
+  ${h.tevkifEdilen > 0 ? `<div class="ts"><span>KDV Tevkifatı (${h.tevkifatOranMetin})</span><span>-${para(h.tevkifEdilen)}</span></div>
+  <div class="ts"><span>Tahsil edilecek KDV</span><span>${para(h.tahsilKdv)}</span></div>` : ""}
+  <div class="ts genel"><span>Genel Toplam</span><span>${para(h.genel)}</span></div>
+</div>
+
+<div class="gecerli">Bu teklif <b>${son}</b> tarihine kadar geçerlidir.</div>
+
+${durum.firma.iban ? `<div class="odeme"><h2>Ödeme Bilgileri</h2>
+<div style="font-size:13px">${kacir(durum.firma.banka || "")}${durum.firma.banka ? "<br>" : ""}
+<b>IBAN:</b> ${kacir(durum.firma.iban)}</div></div>` : ""}
+
+<div class="kosul"><h2>Koşullar</h2>
+  <ul>${s.kosullar.map(k => `<li>${kacir(k)}</li>`).join("")}</ul></div>
+
+<div class="imzalar">
+  <div class="imza"><div class="cizgi">Teklifi veren${durum.firma.yetkili ? `<br><b>${kacir(durum.firma.yetkili)}</b>` : ""}</div></div>
+  <div class="imza"><div class="cizgi">Kabul eden${musteri ? `<br><b>${kacir(musteri)}</b>` : ""}</div></div>
+</div>
+
+<footer><span>${kacir(durum.firma.ad) || "Teklif Ustası"}</span><span>${no} · ${bugun}</span></footer>
+
+<p class="yazdirma-gizle" style="margin-top:30px;text-align:center">
+<button onclick="window.print()" style="padding:14px 30px;font-size:15px;font-weight:700;
+  background:#113769;color:#fff;border:none;border-radius:11px;cursor:pointer">
   PDF olarak kaydet / Yazdır</button></p>
 </body></html>`);
   w.document.close();
