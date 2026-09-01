@@ -9,6 +9,7 @@ const TEVKIFAT_ORANLARI = ["2/10","3/10","4/10","5/10","7/10","9/10","10/10"];
 
 const SEKTORLER = {
   nakliyat: {
+    ikon: `<path d="M10 17h4V5H2v12h3m5 0H5m5 0v-5h9l3 5h-3m-9 0a2 2 0 104 0m5 0a2 2 0 104 0"/>`,
     ad: "Evden Eve Nakliyat",
     kdv: 20,
     tevkifat: { oran: "2/10", ad: "Yük taşımacılığı" },
@@ -33,6 +34,7 @@ const SEKTORLER = {
   },
 
   tadilat: {
+    ikon: `<path d="M14 7l-9 9 3 3 9-9M14 7l1.5-1.5a2.1 2.1 0 013 0l1 1a2.1 2.1 0 010 3L17 11M14 7l3 4"/>`,
     ad: "Tadilat & Boya",
     kdv: 20,
     tevkifat: { oran: "4/10", ad: "Yapım işleri" },
@@ -56,6 +58,7 @@ const SEKTORLER = {
   },
 
   matbaa: {
+    ikon: `<path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z"/>`,
     ad: "Matbaa & Baskı",
     kdv: 20,
     kalemler: [
@@ -78,6 +81,7 @@ const SEKTORLER = {
   },
 
   temizlik: {
+    ikon: `<path d="M9 3h6l1 6H8l1-6zM8 9v3a4 4 0 004 4 4 4 0 004-4V9M12 16v5"/>`,
     ad: "Temizlik Hizmeti",
     kdv: 20,
     tevkifat: { oran: "9/10", ad: "Temizlik hizmeti" },
@@ -101,6 +105,7 @@ const SEKTORLER = {
   },
 
   catering: {
+    ikon: `<path d="M4 3v8a3 3 0 003 3v7M7 3v6M10 3v6M17 3c-1.5 2-2 4-2 6s.5 3 2 3v9"/>`,
     ad: "Catering & Organizasyon",
     kdv: 10,
     kalemler: [
@@ -123,6 +128,7 @@ const SEKTORLER = {
   },
 
   ozel: {
+    ikon: `<path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1A1.6 1.6 0 008 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1A1.6 1.6 0 004.6 8a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V2a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H22a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/>`,
     ad: "Kendi Sektörüm",
     kdv: 20,
     kalemler: [

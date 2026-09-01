@@ -155,7 +155,9 @@ function hesapla() {
 function sektorleriCiz() {
   $("#sektorler").innerHTML = Object.entries(SEKTORLER).map(([kod, s]) => `
     <div class="sektor ${kod === durum.sektor ? "secili" : ""}" data-kod="${kod}">
-      ${s.ad}
+      <svg class="sikon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${s.ikon}</svg>
+      <span>${s.ad}</span>
     </div>`).join("");
 
   document.querySelectorAll(".sektor").forEach(el => {
