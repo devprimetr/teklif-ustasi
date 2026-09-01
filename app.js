@@ -26,10 +26,28 @@ const kacir = s => String(s ?? "").replace(/[&<>"']/g,
 
 /* ---------- kalıcılık ---------- */
 function yukle() {
+  const varsayilan = { ...durum, firma: { ...durum.firma } };
   try {
     const h = localStorage.getItem(DEPO);
     if (h) durum = { ...durum, ...JSON.parse(h) };
-  } catch (e) { /* özel sekme / kapalı depolama — varsayılanla devam */ }
+  } catch (e) { /* özel sekme / bozuk JSON — varsayılanla devam */ }
+
+  /* Kayitli veri BOZUK olabilir: null, yanlis tip, eski surumden eksik alan.
+     Yayilma (spread) bunu duzeltmez — {...d, firma:null} firma'yi null yapar
+     ve uygulama tamamen coker. Her alan tipiyle birlikte dogrulanir. */
+  const nesne = v => (v && typeof v === "object" && !Array.isArray(v)) ? v : {};
+  durum.firma      = { ...varsayilan.firma, ...nesne(durum.firma) };
+  durum.fiyatlar   = nesne(durum.fiyatlar);
+  durum.adlar      = nesne(durum.adlar);
+  durum.degerler   = nesne(durum.degerler);
+  durum.opsiyonlar = nesne(durum.opsiyonlar);
+  durum.indirimler = nesne(durum.indirimler);
+  durum.sayac      = nesne(durum.sayac);
+  durum.gecmis     = Array.isArray(durum.gecmis) ? durum.gecmis : [];
+  durum.tevkifat   = !!durum.tevkifat;
+  if (typeof durum.tevkifatOran !== "string") durum.tevkifatOran = "";
+  if (!SEKTORLER[durum.sektor]) durum.sektor = "nakliyat";
+  if (!["otomatik", "acik", "koyu"].includes(durum.tema)) durum.tema = "otomatik";
 }
 function kaydet() {
   try {
@@ -551,7 +569,7 @@ td.sag{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 </style></head><body>
 <header><div style="display:flex;gap:14px;align-items:flex-start">
 ${durum.firma.logo ? `<img src="${durum.firma.logo}" alt="" style="max-width:72px;max-height:72px;object-fit:contain">` : ""}
-<div><div class="buyuk">${kacir(durum.firma.ad) || s.ikon + " " + s.ad}</div>
+<div><div class="buyuk">${kacir(durum.firma.ad) || "Fiyat Teklifi"}</div>
 <div style="color:#666;font-size:13px">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · ")) || "Fiyat Teklifi"}</div>
 ${(durum.firma.vd || durum.firma.vkn) ? `<div style="color:#888;font-size:12px;margin-top:2px">${kacir([durum.firma.vd, durum.firma.vkn && ("VKN: " + durum.firma.vkn)].filter(Boolean).join(" · "))}</div>` : ""}</div></div>
 <div style="text-align:right;font-size:13px;color:#666">Teklif No: ${no}<br>${bugun}</div></header>
