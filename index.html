@@ -3,29 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d7a5f">
+<meta name="theme-color" content="#113769">
 <title>Teklif Ustası</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <style>
 :root{
-  /* Marka paleti — ana renk #0d7a5f'ten türetildi, kontrastlar WCAG AA
-     (metin 16.9:1, soluk 4.66:1, bağlantı 5.01:1, düğme metni 5.29:1) */
-  --bg:#f7f9f8; --kart:#fff; --metin:#0c1a16; --soluk:#397c69;
-  --cizgi:#dae3de; --vurgu:#0d7a5f; --vurgu-metin:#fff;
-  --yesil:#16a34a; --kirmizi:#b42318; --girdi:#fff;
+  /* Marka paleti — ton 214°, kategori normunun merkezi (215°).
+     Karar gerekcesi: Labrecque & Milne (2013) — yuksek ilgilenimli,
+     hata affetmeyen kategorilerde (B2B finans/teklif) kategori renk
+     normuna baglilik marka performansina fayda sagliyor.
+     113 rakip ikonu olculdu: mavi %42 dominant, 205-235 bandinda 35 uygulama.
+     Ayrisma tondan degil doygunluk/parlakliktan: yigin ortalamasi
+     %34 parlaklik / %91 doygunluk; bizimki %24 / %72 — daha koyu ve
+     daha az doygun. Koyu = deger algisi (Asama 4), dusuk doygunluk =
+     karanlik modda halation yok (Asama 5).
+     Kontrastlar: metin 15.79:1 · soluk 6.19:1 · dugme metni 11.84:1 */
+  --bg:#f5f7f9; --kart:#fff; --metin:#151d28; --soluk:#495e79;
+  --cizgi:#dae0e7; --vurgu:#113769; --vurgu-metin:#fff;
+  --yesil:#15803d; --kirmizi:#b42318; --girdi:#fff;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-tema="acik"]){
-    --bg:#0a1512; --kart:#122621; --metin:#e9f2ef; --soluk:#8fbdae;
-    --cizgi:#1a3830; --vurgu:#16cda0; --vurgu-metin:#0a1512;
-    --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1f1b;
+    --bg:#0a111a; --kart:#131d2b; --metin:#e6ecf5; --soluk:#94a9c4;
+    --cizgi:#1e2c3f; --vurgu:#699ed3; --vurgu-metin:#0a111a;
+    --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0e1722;
   }
 }
 :root[data-tema="koyu"]{
-  --bg:#0a1512; --kart:#122621; --metin:#e9f2ef; --soluk:#8fbdae;
-  --cizgi:#1a3830; --vurgu:#16cda0; --vurgu-metin:#0a1512;
-  --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1f1b;
+  --bg:#0a111a; --kart:#131d2b; --metin:#e6ecf5; --soluk:#94a9c4;
+  --cizgi:#1e2c3f; --vurgu:#699ed3; --vurgu-metin:#0a111a;
+  --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0e1722;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--metin);
