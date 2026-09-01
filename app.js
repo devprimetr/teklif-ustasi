@@ -507,6 +507,11 @@ temaUygula();
 firmaCiz();
 ciz();
 
+// test: ?ac=firma ile firma penceresini otomatik ac
+if (new URLSearchParams(location.search).get("ac") === "firma") {
+  $("#firmaDuzenle").click();
+}
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
