@@ -10,7 +10,6 @@ const TEVKIFAT_ORANLARI = ["2/10","3/10","4/10","5/10","7/10","9/10","10/10"];
 const SEKTORLER = {
   nakliyat: {
     ad: "Evden Eve Nakliyat",
-    ikon: "🚚",
     kdv: 20,
     tevkifat: { oran: "2/10", ad: "Yük taşımacılığı" },
     kalemler: [
@@ -35,7 +34,6 @@ const SEKTORLER = {
 
   tadilat: {
     ad: "Tadilat & Boya",
-    ikon: "🔨",
     kdv: 20,
     tevkifat: { oran: "4/10", ad: "Yapım işleri" },
     kalemler: [
@@ -59,7 +57,6 @@ const SEKTORLER = {
 
   matbaa: {
     ad: "Matbaa & Baskı",
-    ikon: "🖨️",
     kdv: 20,
     kalemler: [
       { kod: "adet",       ad: "Baskı adedi",      birim: "adet", fiyat: 4,    tip: "birim" },
@@ -82,7 +79,6 @@ const SEKTORLER = {
 
   temizlik: {
     ad: "Temizlik Hizmeti",
-    ikon: "🧽",
     kdv: 20,
     tevkifat: { oran: "9/10", ad: "Temizlik hizmeti" },
     kalemler: [
@@ -106,7 +102,6 @@ const SEKTORLER = {
 
   catering: {
     ad: "Catering & Organizasyon",
-    ikon: "🍽️",
     kdv: 10,
     kalemler: [
       { kod: "kisi",       ad: "Kişi sayısı",      birim: "kişi", fiyat: 420,  tip: "birim" },
@@ -129,7 +124,6 @@ const SEKTORLER = {
 
   ozel: {
     ad: "Kendi Sektörüm",
-    ikon: "⚙️",
     kdv: 20,
     kalemler: [
       { kod: "kalem1",     ad: "Kalem 1",          birim: "adet", fiyat: 100,  tip: "birim" },
