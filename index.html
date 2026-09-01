@@ -3,27 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#0d7a5f">
 <title>Teklif Ustası</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <style>
 :root{
-  --bg:#f6f7f9; --kart:#fff; --metin:#0f172a; --soluk:#64748b;
-  --cizgi:#e2e8f0; --vurgu:#0f172a; --vurgu-metin:#fff;
-  --yesil:#0a7a3d; --kirmizi:#b42318; --girdi:#fff;
+  /* Marka paleti — ana renk #0d7a5f'ten türetildi, kontrastlar WCAG AA
+     (metin 16.9:1, soluk 4.66:1, bağlantı 5.01:1, düğme metni 5.29:1) */
+  --bg:#f7f9f8; --kart:#fff; --metin:#0c1a16; --soluk:#397c69;
+  --cizgi:#dae3de; --vurgu:#0d7a5f; --vurgu-metin:#fff;
+  --yesil:#16a34a; --kirmizi:#b42318; --girdi:#fff;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-tema="acik"]){
-    --bg:#0b1220; --kart:#111a2b; --metin:#e8eefc; --soluk:#94a3b8;
-    --cizgi:#1e293b; --vurgu:#e8eefc; --vurgu-metin:#0b1220;
-    --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1829;
+    --bg:#0a1512; --kart:#122621; --metin:#e9f2ef; --soluk:#8fbdae;
+    --cizgi:#1a3830; --vurgu:#16cda0; --vurgu-metin:#0a1512;
+    --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1f1b;
   }
 }
 :root[data-tema="koyu"]{
-  --bg:#0b1220; --kart:#111a2b; --metin:#e8eefc; --soluk:#94a3b8;
-  --cizgi:#1e293b; --vurgu:#e8eefc; --vurgu-metin:#0b1220;
-  --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1829;
+  --bg:#0a1512; --kart:#122621; --metin:#e9f2ef; --soluk:#8fbdae;
+  --cizgi:#1a3830; --vurgu:#16cda0; --vurgu-metin:#0a1512;
+  --yesil:#4ade80; --kirmizi:#f87171; --girdi:#0f1f1b;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--metin);
