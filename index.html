@@ -32,8 +32,9 @@ body{margin:0;background:var(--bg);color:var(--metin);
   font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
   font-size:16px;line-height:1.5;padding-bottom:96px}
 .ust{position:sticky;top:0;z-index:20;background:var(--kart);
-  border-bottom:1px solid var(--cizgi);padding:14px 16px;
-  padding-top:calc(14px + env(safe-area-inset-top));
+  border-bottom:1px solid var(--cizgi);
+  padding-top:env(safe-area-inset-top)}
+.ust-ic{max-width:640px;margin:0 auto;padding:14px 16px;
   display:flex;align-items:center;gap:12px}
 .ust h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.2px;flex:1}
 .ust button{background:none;border:none;color:var(--soluk);font-size:20px;
@@ -99,10 +100,10 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 </head>
 <body>
 
-<div class="ust yazdirma-gizle">
+<div class="ust yazdirma-gizle"><div class="ust-ic">
   <h1>Teklif Ustası</h1>
   <button id="temaBtn" title="Tema">◐</button>
-</div>
+</div></div>
 
 <div class="sar">
 

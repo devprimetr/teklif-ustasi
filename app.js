@@ -293,6 +293,14 @@ ${r.detay ? `<div class="detay">${kacir(r.detay)}</div>` : ""}</td>
 
 /* ---------- başlat ---------- */
 yukle();
+/* Magaza ekran goruntusu icin ornek veri: ?demo=1 */
+if (new URLSearchParams(location.search).get("demo") === "1") {
+  durum.degerler = { mesafe: 45, hacim: 22, kat: 2 };
+  durum.opsiyonlar = { paketleme: true, sigorta: true };
+} else if (new URLSearchParams(location.search).get("demo") === "2") {
+  durum.degerler = { alan: 85, oda: 3 };
+  durum.opsiyonlar = { malzeme: true, tasima: true };
+}
 temaUygula();
 firmaCiz();
 ciz();
