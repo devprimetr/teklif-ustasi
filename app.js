@@ -387,19 +387,62 @@ $("#gecmisTemizle").onclick = () => {
 function teklifMetni(no) {
   const s = SEKTORLER[durum.sektor];
   const h = hesapla();
+  const f = durum.firma;
   const musteri = $("#musteri").value.trim();
   const bugun = new Date().toLocaleDateString("tr-TR");
   const son = new Date(Date.now() + 14 * 864e5).toLocaleDateString("tr-TR");
 
-  let t = `FİYAT TEKLİFİ\n${s.ad}\n`;
-  if (musteri) t += `Sayın ${musteri}\n`;
-  t += `Tarih: ${bugun}\n\n`;
+  let t = `FİYAT TEKLİFİ${no ? " · " + no : ""}
+`;
+  if (f.ad) t += `${f.ad}
+`;
+  const iletisim = [f.tel, f.mail, f.adres].filter(Boolean).join(" · ");
+  if (iletisim) t += `${iletisim}
+`;
+  t += `${s.ad}
+`;
+  if (musteri) t += `Sayın ${musteri}
+`;
+  t += `Tarih: ${bugun}
+
+`;
+
   for (const r of h.satirlar) {
-    t += `• ${r.ad}${r.detay ? ` (${r.detay})` : ""}\n  ${para(r.tutar)}\n`;
+    t += `• ${r.ad}${r.detay ? ` (${r.detay})` : ""}
+  ${para(r.tutar)}
+`;
   }
-  t += `\nAra toplam: ${para(h.ara)}\nKDV (%${h.kdvOrani}): ${para(h.kdv)}\n`;
-  t += `GENEL TOPLAM: ${para(h.genel)}\n\n`;
-  t += `Teklif ${son} tarihine kadar geçerlidir.\n\nKoşullar:\n`;
+  for (const r of h.indirimSatirlari) {
+    t += `• ${r.ad} (${r.detay})
+  ${para(r.tutar)}
+`;
+  }
+
+  // Her satir gosterilmeli: musteri ara toplamdan genel toplama giden
+  // yolu kendi hesaplayabilmeli. Indirim/tevkifat gizlenirse rakamlar
+  // tutmuyor ve teklif guvenilirligini kaybediyor.
+  t += `
+Ara toplam: ${para(h.ara)}
+`;
+  if (h.toplamIndirim > 0) t += `İndirim: -${para(h.toplamIndirim)}
+`;
+  if (h.toplamIndirim > 0) t += `Net tutar: ${para(h.net)}
+`;
+  t += `KDV (%${h.kdvOrani}): ${para(h.kdv)}
+`;
+  if (h.tevkifEdilen > 0) {
+    t += `KDV Tevkifatı (${h.tevkifatOranMetin}): -${para(h.tevkifEdilen)}
+`;
+    t += `Tahsil edilecek KDV: ${para(h.tahsilKdv)}
+`;
+  }
+  t += `GENEL TOPLAM: ${para(h.genel)}
+
+`;
+  t += `Teklif ${son} tarihine kadar geçerlidir.
+
+Koşullar:
+`;
   t += s.kosullar.map(k => `- ${k}`).join("\n");
   return t;
 }
