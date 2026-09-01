@@ -211,6 +211,17 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
     <input type="text" id="fFirmaBanka" placeholder="Ziraat Bankası — Ahmet Yılmaz">
   </div>
   <div style="margin-bottom:12px">
+    <label>Logo / kaşe <span style="font-weight:400">(isteğe bağlı)</span></label>
+    <div style="display:flex;gap:10px;align-items:center">
+      <img id="logoOnizleme" alt="" style="max-width:64px;max-height:64px;border-radius:8px;
+           border:1px solid var(--cizgi);display:none">
+      <input type="file" id="fFirmaLogo" accept="image/png,image/jpeg,image/webp"
+             style="flex:1;font-size:13px;padding:8px">
+      <button type="button" class="duzenle" id="logoSil" style="display:none">kaldır</button>
+    </div>
+    <p class="ipucu">Teklif belgesinin başında görünür. Telefonunuzda saklanır.</p>
+  </div>
+  <div style="margin-bottom:12px">
     <label>Yetkili adı <span style="font-weight:400">(imza satırı için, isteğe bağlı)</span></label>
     <input type="text" id="fFirmaYetkili" placeholder="Ahmet Yılmaz">
   </div>

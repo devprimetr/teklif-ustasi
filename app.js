@@ -13,7 +13,7 @@ let durum = {
   indirimler: {},    // { indirimKodu: true/false }
   tevkifat: false,   // KDV tevkifati uygulansin mi
   tevkifatOran: "",  // kullanicinin sectigi oran (bos = sektor varsayilani)
-  firma: { ad: "", tel: "", mail: "", adres: "", vd: "", vkn: "", iban: "", banka: "", yetkili: "" },
+  firma: { ad: "", tel: "", mail: "", adres: "", vd: "", vkn: "", iban: "", banka: "", yetkili: "", logo: "" },
   gecmis: [],        // kaydedilen teklifler
   sayac: {},         // { "2026": 7 } -> teklif numarasi
   tema: "otomatik"
@@ -306,8 +306,41 @@ $("#firmaDuzenle").onclick = () => {
   $("#fFirmaIban").value = durum.firma.iban || "";
   $("#fFirmaBanka").value = durum.firma.banka || "";
   $("#fFirmaYetkili").value = durum.firma.yetkili || "";
+  logoOnizle();
   $("#firmaDlg").showModal();
 };
+/* Logo: localStorage ~5MB sinirli oldugu icin goruntu 200px'e kucultulup
+   JPEG olarak saklanir. Ham dosya dogrudan saklanirsa tek fotograf
+   kotayi doldurup TUM ayarlarin kaydini bozar. */
+function logoOnizle() {
+  const im = $("#logoOnizleme"), sil = $("#logoSil");
+  if (durum.firma.logo) { im.src = durum.firma.logo; im.style.display = "block"; sil.style.display = ""; }
+  else { im.style.display = "none"; sil.style.display = "none"; }
+}
+$("#fFirmaLogo").onchange = e => {
+  const dosya = e.target.files[0];
+  if (!dosya) return;
+  if (dosya.size > 8 * 1024 * 1024) { alert("Dosya çok büyük (en fazla 8 MB)."); return; }
+  const fr = new FileReader();
+  fr.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const en = 200, oran = Math.min(en / img.width, en / img.height, 1);
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * oran); c.height = Math.round(img.height * oran);
+      const x = c.getContext("2d");
+      x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height);
+      x.drawImage(img, 0, 0, c.width, c.height);
+      durum.firma.logo = c.toDataURL("image/jpeg", 0.82);
+      logoOnizle();
+    };
+    img.onerror = () => alert("Görsel okunamadı.");
+    img.src = fr.result;
+  };
+  fr.readAsDataURL(dosya);
+};
+$("#logoSil").onclick = () => { durum.firma.logo = ""; $("#fFirmaLogo").value = ""; logoOnizle(); };
+
 $("#firmaKapat").onclick = () => $("#firmaDlg").close();
 $("#firmaKaydet").onclick = () => {
   durum.firma = {
@@ -315,7 +348,7 @@ $("#firmaKaydet").onclick = () => {
     mail: $("#fFirmaMail").value.trim(), adres: $("#fFirmaAdres").value.trim(),
     vd: $("#fFirmaVd").value.trim(), vkn: $("#fFirmaVkn").value.trim(),
     iban: $("#fFirmaIban").value.trim(), banka: $("#fFirmaBanka").value.trim(),
-    yetkili: $("#fFirmaYetkili").value.trim()
+    yetkili: $("#fFirmaYetkili").value.trim(), logo: durum.firma.logo || ""
   };
   kaydet(); $("#firmaDlg").close(); firmaCiz();
 };
@@ -516,9 +549,11 @@ td.sag{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .kosul li{font-size:12.5px;color:#444;margin-bottom:4px}
 @media print{body{padding:0}.yazdirma-gizle{display:none}}
 </style></head><body>
-<header><div><div class="buyuk">${kacir(durum.firma.ad) || s.ikon + " " + s.ad}</div>
+<header><div style="display:flex;gap:14px;align-items:flex-start">
+${durum.firma.logo ? `<img src="${durum.firma.logo}" alt="" style="max-width:72px;max-height:72px;object-fit:contain">` : ""}
+<div><div class="buyuk">${kacir(durum.firma.ad) || s.ikon + " " + s.ad}</div>
 <div style="color:#666;font-size:13px">${kacir([durum.firma.tel, durum.firma.mail, durum.firma.adres].filter(Boolean).join(" · ")) || "Fiyat Teklifi"}</div>
-${(durum.firma.vd || durum.firma.vkn) ? `<div style="color:#888;font-size:12px;margin-top:2px">${kacir([durum.firma.vd, durum.firma.vkn && ("VKN: " + durum.firma.vkn)].filter(Boolean).join(" · "))}</div>` : ""}</div>
+${(durum.firma.vd || durum.firma.vkn) ? `<div style="color:#888;font-size:12px;margin-top:2px">${kacir([durum.firma.vd, durum.firma.vkn && ("VKN: " + durum.firma.vkn)].filter(Boolean).join(" · "))}</div>` : ""}</div></div>
 <div style="text-align:right;font-size:13px;color:#666">Teklif No: ${no}<br>${bugun}</div></header>
 ${musteri ? `<p style="margin:0 0 20px"><span style="color:#888;font-size:11px;
   text-transform:uppercase;letter-spacing:1px">Sayın</span><br>
